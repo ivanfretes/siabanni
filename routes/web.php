@@ -9,26 +9,9 @@
 | contains the "web" middleware group. Now create something great!
 |
 */
-//in controller :- return (new ResultOutput())->output($data);
-/*
-class ResultOutput()
-{
-    private $type;
-    public __construct(Request $request) {
-        $this->output = 'view';
-        if ($request->wantsJson()) {
-            $this->output = 'json';
-        }
-    }
-    public method output($data) {
-        if ($this->type =='view') {
-            // return the view with data
-        } else {
-            // return the json output
-        }
-    }
-}
-*/
+
+
+
 Route::get('/', function () {
     return view('welcome');
 });
@@ -39,11 +22,6 @@ Route::get('/home', 'HomeController@index')->name('home');
 
 Route::middleware(['auth'])->group(function (){
   Route::get('logs', '\Rap2hpoutre\LaravelLogViewer\LogViewerController@index');
-  // Route::get('/view-attendance/section/{section_id}',function($section_id){
-  //   if($section_id > 0){
-  //     $attendances = App\Attendance::with(['student'])->where('section_id', $section_id)->get();
-  //   }
-  // });
   Route::get('attendances/students/{teacher_id}/{course_id}/{exam_id}/{section_id}', 'AttendanceController@addStudentsToCourseBeforeAtt')->middleware(['teacher']);
   Route::get('attendances/{section_id}/{student_id}/{exam_id}', 'AttendanceController@index');
   Route::get('attendances/{section_id}', 'AttendanceController@sectionIndex')->middleware(['teacher']);
@@ -217,27 +195,9 @@ Route::middleware(['admin','auth'])->group(function (){
 //use PDF;
 Route::middleware(['master.admin','auth'])->group(function (){
   Route::post('upload/file', 'UploadController@upload');
-//   Route::get('pdf/profile/{user_id}',function($user_id){
-//     $data = App\User::find($user_id);
-//     PDF::setOptions(['defaultFont' => 'sans-serif', 'isHtml5ParserEnabled' => true]);
-//     $pdf = PDF::loadView('pdf.profile-pdf', ['user' => $data]);
-// 		return $pdf->stream('profile.pdf');
-//   });
-//   Route::get('pdf/result/{user_id}/{exam_id}',function($user_id, $exam_id){
-//     $data = App\User::find($user_id);
-//     $grades = App\Grade::with('exam')->where('student_id', $user_id)->where('exam_id',$exam_id)->latest()->get();
-//     PDF::setOptions(['defaultFont' => 'sans-serif', 'isHtml5ParserEnabled' => true]);
-//     $pdf = PDF::loadView('pdf.result-pdf', ['grades' => $grades, 'user'=>$data]);
-// 		return $pdf->stream('result.pdf');
-//   });
 });
 Route::middleware(['teacher','auth'])->group(function (){
   Route::post('calculate-marks','GradeController@calculateMarks');
   Route::post('message/students', 'NotificationController@store');
 });
-// Route::middleware(['auth'])->group(function (){
-//   Route::get('download/pdf', function(){
-//     $pathToFile = public_path('storage/Bano-EducationandAspiration.pdf');
-//     return response()->download($pathToFile);
-//   });
-// });
+
