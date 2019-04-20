@@ -26,7 +26,7 @@ NB: replace the stars (*) by your database configurations
 
 Now, type in order these commands in a terminal after positionning in the project folder :
 ```
-1- composer update
+1- composer install
 2- php artisan migrate --seed
 3- php artisan serve
 ```
