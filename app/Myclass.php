@@ -6,7 +6,15 @@ use Illuminate\Database\Eloquent\Model;
 
 class Myclass extends Model
 {
-	protected $table = "classes";
+    protected $table = "classes";
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'class_number', 'group', 'school_id',
+    ];
     /**
      * Get the school record associated with the user.
     */
@@ -20,13 +28,13 @@ class Myclass extends Model
         return $this->hasMany('App\Section','class_id');
     }
 
-    public function exam()
-    {
-        return $this->belongsTo('App\ExamForClass');
-    }
+    // public function exam()
+    // {
+    //     return $this->belongsTo('App\ExamForClass');
+    // }
 
 	public function books()
     {
-        return $this->hasMany('App\Book','book_id');
+        return $this->hasMany('App\Book','class_id');
     }
 }

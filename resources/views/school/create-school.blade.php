@@ -116,10 +116,10 @@
                       @endif
                       @if(\Auth::user()->role == 'master')
                         <td>
-                          <a class="btn btn-danger btn-sm" href="{{url('register/admin/'.$school->id.'/'.$school->code)}}"><small>+ Create Admin</small></a>
+                          <a class="btn btn-danger btn-sm" role="button" href="{{url('register/admin/'.$school->id.'/'.$school->code)}}"><small>+ Create Admin</small></a>
                         </td>
                         <td>
-                          <a href="{{url('school/admin-list/'.$school->id)}}"><small>View Admins</small></a>
+                          <a class="btn btn-success btn-sm" role="button" href="{{url('school/admin-list/'.$school->id)}}"><small>View Admins</small></a>
                         </td>
                       @endif
                     </tr>
@@ -174,10 +174,11 @@
                     </tr>
                     @endif
                     @endif
-                  @endforeach
+                    @endforeach
                   </tbody>
                 </table>
                 <br>
+                @foreach($schools as $school)
                 @if(\Auth::user()->role == 'admin' && \Auth::user()->school_id == $school->id)
                 <h4>Add Users</h4>
                 <table class="table table-condensed" style="width:600px">
@@ -226,7 +227,9 @@
                     </tr>
                   </tbody>
                 </table>
+                  @break
                 @endif
+                @endforeach
               </div>
           </div>
         </div>

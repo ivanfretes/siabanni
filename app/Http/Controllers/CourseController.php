@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Course as Course;
 use App\Http\Resources\CourseResource;
 use Illuminate\Http\Request;
+use App\Http\Requests\Course\SaveConfigurationRequest;
 use App\Http\Traits\GradeTrait;
 
 class CourseController extends Controller
@@ -17,17 +18,33 @@ class CourseController extends Controller
      */
     public function index($teacher_id, $section_id){
       if(\Auth::user()->role != 'student' && $teacher_id > 0) {
-        $courses = Course::with(['section', 'teacher','exam'])->where('teacher_id', $teacher_id)->get();
-        $exams = \App\Exam::where('school_id', \Auth::user()->school_id)->where('active',1)->get();
+        $courses = Course::with(['section', 'teacher','exam'])
+                        ->where('teacher_id', $teacher_id)
+                        ->get();
+        $exams = \App\Exam::where('school_id', \Auth::user()->school_id)
+                          ->where('active',1)
+                          ->get();
 
         return view('course.teacher-course',['courses'=>$courses,'exams'=>$exams]);
-      }else if(\Auth::user()->role == 'student' && $section_id == \Auth::user()->section_id && $section_id > 0){
-        $courses = Course::with(['section', 'teacher'])->where('section_id', $section_id)->get();
+
+      }else if(\Auth::user()->role == 'student'
+                && $section_id == \Auth::user()->section_id
+                && $section_id > 0)
+      {
+        $courses = Course::with(['section', 'teacher'])
+                        ->where('section_id', $section_id)
+                        ->get();
 
         return view('course.class-course',['courses'=>$courses,'exams'=>[]]);
+
       }else if(\Auth::user()->role != 'student' && $section_id > 0) {
-        $courses = Course::with(['section', 'teacher','exam'])->where('section_id', $section_id)->get();
-        $exams = \App\Exam::where('school_id', \Auth::user()->school_id)->where('active',1)->get();
+
+        $courses = Course::with(['section', 'teacher','exam'])
+                        ->where('section_id', $section_id)
+                        ->get();
+        $exams = \App\Exam::where('school_id', \Auth::user()->school_id)
+                          ->where('active',1)
+                          ->get();
         
         return view('course.class-course',['courses'=>$courses,'exams'=>$exams]);
       } else {
@@ -53,7 +70,10 @@ class CourseController extends Controller
     public function course($teacher_id,$course_id,$exam_id,$section_id)
     {
       $this->addStudentsToCourse($teacher_id,$course_id,$exam_id,$section_id);
-      $students = \App\Grade::with('student')->where('course_id', $course_id)->where('exam_id',$exam_id)->get();
+      $students = \App\Grade::with('student')
+                            ->where('course_id', $course_id)
+                            ->where('exam_id',$exam_id)
+                            ->get();
       return view('course.students', [
         'students'=>$students,
         'teacher_id'=>$teacher_id,
@@ -76,8 +96,25 @@ class CourseController extends Controller
       $tb->course_time = $request->course_time;
       $tb->section_id = $request->section_id;
       $tb->teacher_id = $request->teacher_id;
+      $tb->grade_system_name = '';
+      $tb->quiz_count = 0;
+      $tb->assignment_count = 0;
+      $tb->ct_count = 0;
+      $tb->quiz_percent = 0;
+      $tb->attendance_percent = 0;
+      $tb->assignment_percent = 0;
+      $tb->ct_percent = 0;
+      $tb->final_exam_percent = 0;
+      $tb->practical_percent = 0;
+      $tb->att_fullmark = 0;
+      $tb->quiz_fullmark = 0;
+      $tb->a_fullmark = 0;
+      $tb->ct_fullmark = 0;
+      $tb->final_fullmark = 0;
+      $tb->practical_fullmark = 0;
       $tb->exam_id = 0;
-      // $tb->user_id = $request->user_id;
+      $tb->school_id = auth()->user()->school_id;
+      $tb->user_id = auth()->user()->id; // who is creating
       // $tb->quiz_percent = $request->quiz_percent;
       // $tb->test_percent = $request->test_percent;
       // $tb->assignment_percent = $request->assignment_percent;
@@ -87,25 +124,11 @@ class CourseController extends Controller
       return back()->with('status', 'Created');
     }
 
-    public function saveConfiguration(Request $request){
-      $request->validate([
-        'grade_system_name' => 'required|string',
-        'quiz_count' => 'required|numeric|min:0|max:5',
-        'assignment_count' => 'required|numeric|min:0|max:3',
-        'ct_count' => 'required|numeric|min:0|max:5',
-        'quiz_perc' => 'required|numeric|min:0|max:100',
-        'attendance_perc' => 'required|numeric|min:0|max:100',
-        'assign_perc' => 'required|numeric|min:0|max:100',
-        'ct_perc' => 'required|numeric|min:0|max:100',
-        'final_perc' => 'required|numeric|min:0|max:100',
-        'practical_perc' => 'required|numeric|min:0|max:100',
-        'att_fullmark' => 'required|numeric|min:0|max:100',
-        'quiz_fullmark' => 'required|numeric|min:0|max:100',
-        'assignment_fullmark' => 'required|numeric|min:0|max:100',
-        'ct_fullmark' => 'required|numeric|min:0|max:100',
-        'final_fullmark' => 'required|numeric|min:0|max:100',
-        'practical_fullmark' => 'required|numeric|min:0|max:100',
-      ]);
+    /**
+     * @param SaveConfigurationRequest $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function saveConfiguration(SaveConfigurationRequest $request){
       $tb = Course::find($request->course_id);
       $tb->grade_system_name = $request->grade_system_name;
       $tb->quiz_count = $request->quiz_count;

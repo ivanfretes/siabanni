@@ -16,7 +16,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password',
+        'name', 'email', 'password', 'role', 'code',/* school code*/'student_code', 'active', 'verified', 'school_id', 'section_id',
     ];
 
     /**
@@ -40,7 +40,7 @@ class User extends Authenticatable
 
     public function department()
     {
-        return $this->belongsTo('App\Department');
+        return $this->belongsTo('App\Department','department_id', 'id');
     }
 
     public function studentInfo(){
@@ -53,5 +53,10 @@ class User extends Authenticatable
 
     public function notifications(){
         return $this->hasMany('App\Notification','student_id');
+    }
+
+    public function hasRole(string $role): bool
+    {
+        return $this->role == $role ? true : false;
     }
 }

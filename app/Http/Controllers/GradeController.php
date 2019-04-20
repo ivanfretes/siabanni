@@ -211,7 +211,8 @@ class GradeController extends Controller
           }
         }
         
-
+        // Percentage related calculation
+        
         if($course->att_fullmark > 0){
           $final_att_mark = ($attPerc*$grade['attendance'])/($course->att_fullmark);
         } else {
@@ -250,8 +251,9 @@ class GradeController extends Controller
         } else {
           $final_practical_mark = $grade['practical'];
         }
-       
+        // Calculate total marks
         $totalMarks = round((round($final_att_mark, 8, 2)+round($final_quiz_mark, 8, 2)+round($final_assignment_mark, 8, 2)+round($final_ct_mark, 8, 2)+round($final_finalExam_mark, 8, 2)+round($final_practical_mark, 8, 2)), 8, 2);
+        // Calculate GPA from Total marks
         $gpa = $this->calculateGpa($gradeSystem, $totalMarks);
         $tb = Grade::find($grade['id']);
         $tb->marks = $totalMarks;
@@ -343,12 +345,11 @@ class GradeController extends Controller
         $tbc[] = $tb->attributesToArray();
         $i++;
       }
-      
       try{
           if(count($tbc) > 0)
-            Grade::insert($tbc);
+            \Batch::update('grades',$tbc,'id');
         }catch(\Exception $e){
-            return false;
+            return "OOps, an error occured";
         }
 
       return back()->with('status', 'Saved');
